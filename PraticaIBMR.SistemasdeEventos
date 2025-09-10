@@ -1,0 +1,118 @@
+import java.time.LocalDateTime;
+import java.util.*;
+
+public class Main {
+    private static Scanner sc = new Scanner(System.in);
+    private static List<Usuario> usuarios = new ArrayList<>();
+    private static List<Evento> eventos = new ArrayList<>();
+    private static Map<Usuario, List<Evento>> participacoes = new HashMap<>();
+
+    public static void main(String[] args) {
+        int opcao;
+        do {
+            System.out.println("\n==== Menu ====");
+            System.out.println("1. Cadastrar usuário");
+            System.out.println("2. Cadastrar evento");
+            System.out.println("3. Listar eventos");
+            System.out.println("4. Confirmar participação em evento");
+            System.out.println("5. Consultar eventos de um usuário");
+            System.out.println("0. Sair");
+            System.out.print("Escolha: ");
+            opcao = sc.nextInt();
+            sc.nextLine();
+
+            switch (opcao) {
+                case 1: cadastrarUsuario(); break;
+                case 2: cadastrarEvento(); break;
+                case 3: listarEventos(); break;
+                case 4: confirmarParticipacao(); break;
+                case 5: consultarEventosUsuario(); break;
+            }
+        } while (opcao != 0);
+    }
+
+    private static void cadastrarUsuario() {
+        System.out.print("Nome: ");
+        String nome = sc.nextLine();
+        System.out.print("Email: ");
+        String email = sc.nextLine();
+
+        Usuario u = new Usuario(nome, email);
+        usuarios.add(u);
+        participacoes.put(u, new ArrayList<>());
+        System.out.println("Usuário cadastrado com sucesso!");
+    }
+
+    private static void cadastrarEvento() {
+        System.out.print("Título do evento: ");
+        String titulo = sc.nextLine();
+        System.out.print("Local: ");
+        String local = sc.nextLine();
+        System.out.print("Data e hora (YYYY-MM-DDTHH:MM): ");
+        String dataHoraStr = sc.nextLine();
+        LocalDateTime dataHora = LocalDateTime.parse(dataHoraStr);
+
+        Evento e = new Evento(titulo, dataHora, local);
+        eventos.add(e);
+        System.out.println("Evento cadastrado com sucesso!");
+    }
+
+    private static void listarEventos() {
+        if (eventos.isEmpty()) {
+            System.out.println("Nenhum evento cadastrado.");
+        } else {
+            for (int i = 0; i < eventos.size(); i++) {
+                System.out.println((i+1) + ". " + eventos.get(i));
+            }
+        }
+    }
+
+    private static void confirmarParticipacao() {
+        if (usuarios.isEmpty() || eventos.isEmpty()) {
+            System.out.println("Cadastre pelo menos 1 usuário e 1 evento antes.");
+            return;
+        }
+
+        System.out.println("Selecione o usuário:");
+        for (int i = 0; i < usuarios.size(); i++) {
+            System.out.println((i+1) + ". " + usuarios.get(i));
+        }
+        int uIndex = sc.nextInt() - 1;
+        sc.nextLine();
+        Usuario u = usuarios.get(uIndex);
+
+        listarEventos();
+        System.out.print("Escolha o número do evento: ");
+        int eIndex = sc.nextInt() - 1;
+        sc.nextLine();
+        Evento e = eventos.get(eIndex);
+
+        participacoes.get(u).add(e);
+        System.out.println(u.getNome() + " confirmou presença em: " + e.getTitulo());
+    }
+
+    private static void consultarEventosUsuario() {
+        if (usuarios.isEmpty()) {
+            System.out.println("Nenhum usuário cadastrado.");
+            return;
+        }
+
+        System.out.println("Selecione o usuário:");
+        for (int i = 0; i < usuarios.size(); i++) {
+            System.out.println((i+1) + ". " + usuarios.get(i));
+        }
+        int uIndex = sc.nextInt() - 1;
+        sc.nextLine();
+        Usuario u = usuarios.get(uIndex);
+
+        List<Evento> lista = participacoes.get(u);
+        if (lista.isEmpty()) {
+            System.out.println("Esse usuário não está confirmado em nenhum evento.");
+        } else {
+            System.out.println("Eventos confirmados de " + u.getNome() + ":");
+            for (Evento e : lista) {
+                System.out.println("- " + e);
+            }
+        }
+    }
+}
